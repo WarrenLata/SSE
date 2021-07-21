@@ -5,6 +5,10 @@ Ce repertoire contient un SSE permettant d'ajouter des fonctionnalités supplém
 
 A ce stade je suis encore en train d'ajouter des fonctionnalités en plus.
 
+#Note
+
+Une image docker permettra de runner ce SSE sur n'importe quel environnement
+
 
 # Inspired from
 
