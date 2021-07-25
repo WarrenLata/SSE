@@ -204,9 +204,9 @@ class ExtensionService(SSE.ConnectorServicer):
         y = []
         for request_row in request:
             for row in request_row.rows:
-                param = [d.strData for d in row.duals[0]]
+                param = [d.strData for d in row.duals][0]
                 x.append(param)
-                param = [d.strData for d in row.duals[1]]
+                param = [d.strData for d in row.duals][1]
                 y.append(param)
         x = list(map(float, x))
         y = list(map(float, y))
