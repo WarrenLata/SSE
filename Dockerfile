@@ -15,7 +15,7 @@ RUN pip install scipy
 RUN pip install pandas
 RUN pip install cython
 
-# Make port 80 available to the world outside this container
+# Make port 50052 available to the world outside this container
 EXPOSE 50052
 
 
