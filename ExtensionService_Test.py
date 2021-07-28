@@ -163,23 +163,23 @@ class ExtensionService(SSE.ConnectorServicer):
     @staticmethod
     def _my_test(request, context):
         param_1 = []
-        params_2 = []
+        param_2 = []
         for request_row in request:
             for row in request_row.rows:
-                param_1 = [d.strData for d in row.duals][0]
-                param_2 = [d.strData for d in row.duals][1]
-                if param_1 and param_2:
-                    param_1.append(param_1.replace(",", "."))
-                    param_2.append(param_2.replace(",", "."))
+                x = [d.strData for d in row.duals][0]
+                y = [d.strData for d in row.duals][1]
+                if x and y:
+                    param_1.append(x.replace(",", "."))
+                    param_2.append(y.replace(",", "."))
         param_1 = list(map(float, param_1))
-        param_2 = list(map(float, params_2))
+        param_2 = list(map(float, param_2))
 
         ## chek normality ###
         r, p = stats.shapiro(param_1)
         r1, p1 = stats.shapiro(param_2)
 
         if p<0.05 or p1<0.05:
-            T, p_value = stats.mannwhitneyu(param_1, params_2)
+            T, p_value = stats.mannwhitneyu(param_1, param_2)
 
         else:
             #### check variance   #########
@@ -251,9 +251,6 @@ class ExtensionService(SSE.ConnectorServicer):
     def GetCapabilities(self, request, context):
         """
         Get capabilities.
-        Note that either request or context is used in the implementation of this method, but still added as
-        parameters. The reason is that gRPC always sends both when making a function call and therefore we must include
-        them to avoid error messages regarding too many parameters provided from the client.
         :param request: the request, not used in this method.
         :param context: the context, not used in this method.
         :return: the capabilities.
@@ -330,10 +327,10 @@ class ExtensionService(SSE.ConnectorServicer):
     """
     Implementation of the Server connecting to gRPC.
     """
-
+    # Set up grpc server 
     def Serve(self, port, pem_dir):
         """
-        Sets up the gRPC Server with insecure connection on port
+        gRPC Server with insecure connection on port
         :param port: port to listen on.
         :param pem_dir: Directory including certificates
         :return: None
@@ -343,7 +340,7 @@ class ExtensionService(SSE.ConnectorServicer):
         SSE.add_ConnectorServicer_to_server(self, server)
 
         if pem_dir:
-            # Secure connection
+            # Secure connection if certififcate
             with open(os.path.join(pem_dir, 'sse_server_key.pem'), 'rb') as f:
                 private_key = f.read()
             with open(os.path.join(pem_dir, 'sse_server_cert.pem'), 'rb') as f:
