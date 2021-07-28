@@ -16,15 +16,15 @@ sys.path.append(os.path.join(PARENT_DIR, 'Generated'))
 
 import ServerSideExtension_pb2 as SSE
 import grpc
-from SSEData_helloworld import FunctionType
-from ScriptEval_helloworld import ScriptEval
+from SSEData_Test import FunctionType
+from ScriptEval_Test import ScriptEval
 import scipy.stats as stats
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
 class ExtensionService(SSE.ConnectorServicer):
     """
-    A simple SSE-plugin created for the HelloWorld example.
+    A simple SSE-plugin created based on the HelloWorld example.
     """
 
     def __init__(self, funcdef_file):
@@ -162,34 +162,35 @@ class ExtensionService(SSE.ConnectorServicer):
                 yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
     @staticmethod
     def _my_test(request, context):
-        params = []
-        params1 = []
+        param_1 = []
+        params_2 = []
         for request_row in request:
             for row in request_row.rows:
-                param = [d.strData for d in row.duals][0]
-                params.append(param)
-                param = [d.strData for d in row.duals][1]
-                params1.append(param)
-        params = list(map(float, params))
-        params1 = list(map(float, params1))
+                param_1 = [d.strData for d in row.duals][0]
+                param_2 = [d.strData for d in row.duals][1]
+                if param_1 and param_2:
+                    param_1.append(param_1.replace(",", "."))
+                    param_2.append(param_2.replace(",", "."))
+        param_1 = list(map(float, param_1))
+        param_2 = list(map(float, params_2))
 
         ## chek normality ###
-        r, p = stats.shapiro(params)
-        r1, p1 = stats.shapiro(params1)
+        r, p = stats.shapiro(param_1)
+        r1, p1 = stats.shapiro(param_2)
 
         if p<0.05 or p1<0.05:
-            T, p_value = stats.mannwhitneyu(params, params1)
+            T, p_value = stats.mannwhitneyu(param_1, params_2)
 
         else:
             #### check variance   #########
-            x = np.array(param)
-            y = np.array(params1)
+            x = np.array(param_1)
+            y = np.array(param_2)
             f = np.var(x, ddof=1) / np.var(y, ddof=1)  # calculate F test statistic
             dfn = x.size - 1  # define degrees of freedom numerator
             dfd = y.size - 1  # define degrees of freedom denominator
             p = 1 - stats.f.cdf(f, dfn, dfd)  # find p-value of F test statistic
             ### test ########
-            T,p_value=stats.ttest_ind(params, params1, equal_var=p<0.05)
+            T,p_value=stats.ttest_ind(param_1, param_2, equal_var=p<0.05)
         result = str(p_value)
         duals = iter([SSE.Dual(strData=result)])
         yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
@@ -204,10 +205,12 @@ class ExtensionService(SSE.ConnectorServicer):
         y = []
         for request_row in request:
             for row in request_row.rows:
-                param = [d.strData for d in row.duals][0]
-                x.append(param)
-                param = [d.strData for d in row.duals][1]
-                y.append(param)
+                param_1 = [d.strData for d in row.duals][0]
+                param_2 = [d.strData for d in row.duals][1]
+                if param_1 and  param_2:
+                    x.append(param_1.replace(",", "."))
+                    y.append(param_2.replace(",", "."))
+
         x = list(map(float, x))
         y = list(map(float, y))
         result = str(stats.pearsonr(x, y)[1])
@@ -220,7 +223,7 @@ class ExtensionService(SSE.ConnectorServicer):
     def _Anova(self, request, context):
         # multi-test entre 3 variables ou plus
         # Non len(row.duals[0]) a le nombre de paramètre
-        # on going
+        # working on it
         param1 = []
         param2 = []
         param3 = []
@@ -260,7 +263,7 @@ class ExtensionService(SSE.ConnectorServicer):
         # Enable(or disable) script evaluation
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
-                                        pluginIdentifier='Hello World - Qlik',
+                                        pluginIdentifier='Test Stat - Qlik',
                                         pluginVersion='v1.0.0-beta1')
 
         # If user defined functions supported, add the definitions to the message

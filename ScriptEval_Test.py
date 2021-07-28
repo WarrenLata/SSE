@@ -2,7 +2,7 @@ import logging
 import logging.config
 
 import grpc
-from SSEData_helloworld import ArgType, \
+from SSEData_Test import ArgType, \
                                ReturnType, \
                                FunctionType
 
