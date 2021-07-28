@@ -20,4 +20,4 @@ EXPOSE 50052
 
 
 # Run __main__.py when the container launches
-CMD ["python", "ExtensionService_helloworld.py"]
+CMD ["python", "ExtensionService_Test.py"]
